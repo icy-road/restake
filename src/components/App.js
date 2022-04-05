@@ -17,11 +17,9 @@ import {
 } from 'react-bootstrap';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import GitHubButton from 'react-github-btn'
-import Logo from '../assets/logo.png'
-import Logo2x from '../assets/logo@2x.png'
-import Logo3x from '../assets/logo@3x.png'
+import Logo from '../assets/logo2.png'
 
-import PoweredByAkash from '../assets/powered-by-akash.svg'
+import Telegram from '../assets/telegram.svg'
 
 class App extends React.Component {
   constructor(props) {
@@ -169,7 +167,7 @@ class App extends React.Component {
         <header className="d-flex flex-wrap justify-content-between py-3 mb-4 border-bottom">
           <div className="logo d-flex align-items-center mb-3 mb-md-0 text-dark text-decoration-none">
             <span onClick={() => this.setState({ showAbout: true })} role="button" className="text-dark text-decoration-none">
-              <img src={Logo} srcSet={`${Logo2x} 2x, ${Logo3x} 3x`} alt="REStake" />
+              <img src={Logo} width="80px" alt="Icy Road" />
             </span>
           </div>
           {this.state.address &&
@@ -207,6 +205,9 @@ class App extends React.Component {
         <div className="mb-5">
           <p className="lead fs-3 text-center mt-5 mb-5">
             REStake allows validators to <strong onClick={() => this.setState({ showAbout: true })} className="text-decoration-underline" role="button">auto-compound</strong> your <strong onClick={this.showNetworkSelect} className="text-decoration-underline" role="button">{this.props.network.prettyName}</strong> staking rewards for you
+          </p>
+          <p className="h5 fs-3 text-center mt-5 mb-5">
+            If you need assistance, you can join our <a href="https://t.me/IcyRoadCROStaking" target="_blank" rel="noreferrer">Telegram <img src={Telegram} width="24" alt=""/></a>
           </p>
           <AlertMessage message={this.state.error} variant="danger" dismissible={false} />
           {!this.state.address && (
@@ -249,8 +250,8 @@ class App extends React.Component {
           </p>
         </div>
         <footer className="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-          <a href="https://akash.network" target="_blank" rel="noreferrer" className="col-md-4 mb-0 text-muted">
-            <img src={PoweredByAkash} alt="Powered by Akash" width={200} />
+          <a href="https://t.me/IcyRoadCROStaking" target="_blank" rel="noreferrer" className="col-md-4 mb-0 text-muted">
+            <img src={Telegram} alt="IcyRoadTelegram" width={24} />
           </a>
 
           <a href="https://ecostake.com" target="_blank" rel="noreferrer" className="col-md-4 d-flex align-items-center justify-content-center me-lg-auto link-dark text-decoration-none">
@@ -258,7 +259,7 @@ class App extends React.Component {
           </a>
 
           <p className="col-md-4 mb-0 text-muted text-end justify-content-end d-none d-lg-flex">
-            <GitHubButton href="https://github.com/eco-stake/restake" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star eco-stake/restake on GitHub">Star</GitHubButton>
+            <GitHubButton href="https://github.com/icy-road/restake" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star icy-road/restake on GitHub">Star</GitHubButton>
           </p>
         </footer>
         <About show={this.state.showAbout} onHide={() => this.setState({ showAbout: false })} />
