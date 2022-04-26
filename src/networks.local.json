@@ -1,0 +1,16 @@
+{
+ "cryptoorgchain":  {
+    "name": "cryptoorgchain",
+    "gasPrice": "0.025basecro",
+    "authzSupport": true,
+    "rpcUrl": [
+     "https://mainnet.crypto.org:26657"
+    ],
+    "autostake": {
+      "correctSlip44": true,
+      "batchTxs": 69,
+      "batchQueries": 50,
+      "delegatorTimeout": 10000
+    }
+  }
+}
