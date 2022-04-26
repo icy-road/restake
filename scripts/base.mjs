@@ -208,6 +208,7 @@ export class Autostake {
         },
         (error) => {
           timeStamp(delegatorAddress, "ERROR skipping this run:", error.message || error)
+          console.log(error)
         }
       )
   }
@@ -322,6 +323,7 @@ export class Autostake {
         },
         (error) => {
           timeStamp(address, "ERROR skipping this run:", error.message || error)
+          console.log(error)
           return 0
         }
       )
