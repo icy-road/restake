@@ -1,24 +1,30 @@
 import moment from 'moment'
 import parse from 'parse-duration'
 
-const Operator = (data, validatorData) => {
+const Operator = (network, data) => {
+  const { address } = data
+  const botAddress = data.restake.address
+  const runTime = data.restake.run_time
+  const minimumReward = data.restake.minimum_reward
 
-  function runsPerDay() {
-    const { runTime } = data
+  function runsPerDay(max) {
+    let runs = 0
     if(Array.isArray(runTime)){
-      return runTime.length
+      runs = runTime.length
     }else{
       if(runTime.startsWith('every')){
         const interval = parse(runTime.replace('every ', ''))
-        return (1000 * 60 * 60 * 24) / interval
+        runs = (1000 * 60 * 60 * 24) / interval
+      }else{
+        runs = 1
       }
-      return 1
     }
+    return max && runs > max ? max : runs
   }
 
   function runTimes() {
-    if(Array.isArray(data.runTime)) return data.runTime
-    return [data.runTime]
+    if(Array.isArray(runTime)) return runTime
+    return [runTime]
   }
 
   function runTimesString(){
@@ -30,29 +36,29 @@ const Operator = (data, validatorData) => {
   }
 
   function frequency() {
-    if(Array.isArray(data.runTime)){
-      return data.runTime.length + 'x per day'
+    if(Array.isArray(runTime)){
+      return runTime.length + 'x per day'
     }else{
-      if(data.runTime.startsWith('every')){
-        return data.runTime.replace('every ', '')
+      if(runTime.startsWith('every')){
+        return runTime.replace('every ', '')
       }
       return 'daily'
     }
   }
 
   function nextRun() {
-    if (!data.runTime) return
+    if (!runTime) return
 
-    if (Array.isArray(data.runTime)) {
-      return data.runTime
+    if (Array.isArray(runTime)) {
+      return runTime
         .map(el => nextRunFromRuntime(el))
         .sort((a, b) => a.valueOf() - b.valueOf())
         .find(el => el.isAfter());
     } else {
-      if(data.runTime.startsWith('every')){
-        return nextRunFromInterval(data.runTime)
+      if(runTime.startsWith('every')){
+        return nextRunFromInterval(runTime)
       }
-      return nextRunFromRuntime(data.runTime)
+      return nextRunFromRuntime(runTime)
     }
   }
 
@@ -69,11 +75,12 @@ const Operator = (data, validatorData) => {
   }
 
   return {
-    address: data.address,
-    botAddress: data.botAddress,
-    moniker: validatorData && validatorData.description.moniker,
-    description: validatorData && validatorData.description,
-    validatorData,
+    address,
+    botAddress,
+    runTime,
+    minimumReward,
+    moniker: data.description?.moniker,
+    description: data.description,
     data,
     nextRun,
     frequency,
