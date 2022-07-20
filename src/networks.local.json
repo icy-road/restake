@@ -1,6 +1,6 @@
 {
  "cryptoorgchain":  {
-    "prettyName"cryptoorgchain",
+    "prettyName": "cryptoorgchain",
     "gasPrice": "0.025basecro",
     "authzSupport": true,
     "rpcUrl": [
