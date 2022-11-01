@@ -1,8 +1,5 @@
 import React, { useState, useReducer, useEffect } from 'react';
 
-import CosmosDirectory from '../utils/CosmosDirectory.mjs';
-import Network from '../utils/Network.mjs'
-
 import {
   Button,
   Modal,
@@ -43,7 +40,7 @@ function NetworkSelect(props) {
   }
 
   function selectNetwork(newValue) {
-    const network = props.networks[newValue.value];
+    const network = props.networks[newValue.value.replace(/^(favourite-)/,'')];
     if (network) {
       setLoading(true);
       setError(false);
@@ -67,10 +64,13 @@ function NetworkSelect(props) {
     }
   }
 
-  useEffect(() => {
-
-  }, [selectedNetwork]);
-
+  function selectedOption(){
+    let networks = options.networks
+    if(options.grouped){
+      networks = options.grouped.map(el => el.options).flat()
+    }
+    return networks.find(el => el.value === options.network)
+  }
 
   useEffect(() => {
     if (props.show && !show) {
@@ -82,21 +82,37 @@ function NetworkSelect(props) {
 
   useEffect(() => {
     const networks = Object.values(props.networks).sort((a, b) => a.name > b.name ? 1 : -1)
+    const networkOptions = networks.map(network => {
+      return {
+        value: network.path,
+        label: network.prettyName,
+        image: network.image,
+        operatorCount: network.operatorCount,
+        authz: network.authzSupport,
+        online: network.online,
+        experimental: network.experimental
+      }
+    })
+    const isFavourite = selectedNetwork && props.favourites && props.favourites.includes(selectedNetwork.path)
     setOptions({
-      networks: networks.map(network => {
-        return {
-          value: network.path,
-          label: network.prettyName,
-          image: network.image,
-          operatorCount: network.operatorCount,
-          authz: network.authzSupport,
-          online: network.online,
-          experimental: network.experimental
+      networks: networkOptions,
+      network: isFavourite ? `favourite-${selectedNetwork.path}` : selectedNetwork && selectedNetwork.path,
+      grouped: props.favourites && props.favourites.length > 0 && [
+        {
+          label: 'Favourites',
+          options: networkOptions.filter(el => props.favourites.includes(el.value)).map(el => {
+            return {...el, value: `favourite-${el.value}`}
+          })
+        },
+        {
+          label: 'All Networks',
+          options: networkOptions
         }
-      }),
-      network: selectedNetwork && selectedNetwork.name
+      ]
     })
   }, [props.networks, selectedNetwork])
+
+  const price = props.network?.baseAsset?.prices?.coingecko
 
   return (
     <>
@@ -106,8 +122,11 @@ function NetworkSelect(props) {
             <div className="avatar avatar-sm rounded-circle text-white">
               <img alt={props.network.prettyName} src={props.network.image} height={30} width={30} />
             </div>
-            <div className="d-none d-md-block ms-2">
+            <div className="d-none d-md-block mx-2">
               <span className="h6">{props.network.prettyName}</span>
+              {!!price?.usd && (
+                <em className="text-muted small">&nbsp; ${price.usd.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 2 })}</em>
+              )}
             </div>
             <div className="d-none d-md-block ms-2">
               {props.network.authzSupport
@@ -137,10 +156,10 @@ function NetworkSelect(props) {
               <div className="row mb-3">
                 <div className="col">
                   <Select
-                    value={options.networks.find(el => el.value === options.network)}
+                    value={selectedOption()}
                     isClearable={false}
                     name="network"
-                    options={options.networks}
+                    options={options.grouped || options.networks}
                     onChange={selectNetwork}
                     formatOptionLabel={network => (
                       <div className={'d-flex' + (!network.online ? ' text-muted' : '')}>

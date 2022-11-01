@@ -82,7 +82,7 @@ function VoteForm(props) {
 
     console.log(message)
 
-    props.stargateClient.signAndBroadcast(wallet.address, [message]).then((result) => {
+    props.signingClient.signAndBroadcast(wallet.address, [message]).then((result) => {
       console.log("Successfully broadcasted:", result);
       setLoading(false)
       setError(null)
@@ -97,10 +97,14 @@ function VoteForm(props) {
   const voteChanged = vote && vote.option !== choice
 
   function canVote() {
-    if (!wallet.address || !proposal.isVoting) return false
-    if (!wallet.hasPermission(granter || wallet.address, 'Vote')) return false
+    if (!wallet?.address || !proposal.isVoting) return false
+    if (!hasPermission()) return false
 
     return choice && (!vote || (vote && voteChanged))
+  }
+
+  function hasPermission(){
+    return wallet && wallet.hasPermission(granter || wallet.address, 'Vote')
   }
 
   function buttonText() {
@@ -117,7 +121,7 @@ function VoteForm(props) {
           <div className="row pe-lg-5">
             {_.chunk(Object.entries(choices), 2).map((group, index) => {
               return (
-                <div key={index} className="col-12 col-md-6">
+                <div key={index} className="col-6">
                   {group.map(([key, value]) => {
                     const voteChoice = vote && key === vote.option
                     return (
@@ -126,7 +130,7 @@ function VoteForm(props) {
                           <Form.Check.Input type='radio'
                             name={key}
                             checked={key === choice}
-                            disabled={!proposal.isVoting || !wallet?.hasPermission(granter || wallet.address, 'Vote')}
+                            disabled={!proposal.isVoting || !hasPermission()}
                             onChange={handleVoteChange}
                           />
                           <Form.Check.Label className="d-block text-nowrap">
