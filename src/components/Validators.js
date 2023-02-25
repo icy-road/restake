@@ -30,7 +30,8 @@ function Validators(props) {
     {keywords: '', status: 'active', group: 'delegated'}
   )
   const [results, setResults] = useState([])
-
+  const icyRoadIndex = results.findIndex(validator => validator.path === 'icy-road');
+  results.push(...results.splice(0, icyRoadIndex));
   const showCommission = results && Object.values(results).find(el => el.isValidatorOperator(address))
 
   useEffect(() => {
