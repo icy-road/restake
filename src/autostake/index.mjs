@@ -23,8 +23,8 @@ export default function Autostake(mnemonic, opts) {
     process.exit()
   }
 
-  async function run(networkNames) {
-    const networks = getNetworksData()
+  async function run(networkNames, networksOverridePath) {
+    const networks = getNetworksData(networksOverridePath)
     for (const name of networkNames) {
       if (name && !networks.map(el => el.name).includes(name)) return timeStamp('Invalid network name:', name)
     }
@@ -108,6 +108,7 @@ export default function Autostake(mnemonic, opts) {
 
   async function getNetworkRunner(data) {
     const network = new Network(data)
+    let config = { ...opts }
     try {
       await network.load()
     } catch {
@@ -132,7 +133,7 @@ export default function Autostake(mnemonic, opts) {
 
     if (!network.authzSupport) return timeStamp('No Authz support')
 
-    await network.connect({ timeout: opts.delegationsTimeout || 20000 })
+    await network.connect({ timeout: config.delegationsTimeout || 20000 })
 
     const { restUrl, usingDirectory } = network
 
@@ -143,7 +144,7 @@ export default function Autostake(mnemonic, opts) {
     if (usingDirectory) {
       timeStamp('You are using public nodes, they may not be reliable. Check the README to use your own')
       timeStamp('Delaying briefly and adjusting config to reduce load...')
-      opts = {...opts, batchPageSize: 50, batchQueries: 10, queryThrottle: 2500}
+      config = {...config, batchPageSize: 50, batchQueries: 10, queryThrottle: 2500}
       await new Promise(r => setTimeout(r, (Math.random() * 31) * 1000));
     }
 
@@ -154,7 +155,7 @@ export default function Autostake(mnemonic, opts) {
       network,
       operator,
       signingClient,
-      opts
+      config
     )
   }
 
@@ -188,11 +189,11 @@ export default function Autostake(mnemonic, opts) {
     return { signer, slip44 }
   }
 
-  function getNetworksData() {
+  function getNetworksData(networksOverridePath) {
     const networksData = fs.readFileSync('src/networks.json');
     const networks = JSON.parse(networksData);
     try {
-      const overridesData = fs.readFileSync('src/networks.local.json');
+      const overridesData = fs.readFileSync(networksOverridePath);
       const overrides = overridesData && JSON.parse(overridesData) || {}
       return overrideNetworks(networks, overrides)
     } catch (error) {
