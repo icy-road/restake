@@ -3,8 +3,8 @@
     "prettyName": "cryptoorgchain",
     "gasPrice": "0.025basecro",
     "authzSupport": true,
-    "rpcUrl": [
-     "https://mainnet.crypto.org:26657"
+    "restUrl": [
+     "http://167.114.211.46:1317"
     ],
     "autostake": {
       "correctSlip44": true,
